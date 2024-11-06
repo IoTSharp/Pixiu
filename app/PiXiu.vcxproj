@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{B0CD5029-11F2-4B27-8C15-3518B42068F2}</ProjectGuid>
+    <ProjectName>pixiu</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Label="VisualGDBPackageDefinitions">
+    <ToolchainID>com.sysprogs.toolchain.default-gcc</ToolchainID>
+  </PropertyGroup>
+  <ImportGroup Label="VisualGDBFindComponents">
+    <Import Project="$(LOCALAPPDATA)\VisualGDB\FindComponents.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeIncludeSearchPath>\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0\arm-fullhanv3-linux-uclibcgnueabi;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0\backward;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\lib\gcc\arm-fullhanv3-linux-uclibcgnueabi\6.5.0\include;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\lib\gcc\arm-fullhanv3-linux-uclibcgnueabi\6.5.0\include-fixed;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\sysroot\usr\include;json\include;httpserver.h\include;include;include\curl;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>$(ProjectDir)\gcc_Debug.h;$(VISUALGDB_DIR)\gcc_compat.h;$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /build "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /clean "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /rebuild "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeReBuildCommandLine>
+    <NMakeOutput>$(ProjectDir)pixiu-Debug.vgdbsettings</NMakeOutput>
+    <IncludePath>$(ProjectDir)http-client-c\src;$(IncludePath)</IncludePath>
+    <ReferencePath />
+    <LibraryPath />
+    <NMakePreprocessorDefinitions>__VisualGDB_CFG_Debug;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeIncludeSearchPath>\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0\arm-fullhanv3-linux-uclibcgnueabi\v7\hard\neon-vfpv4;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include\c++\6.5.0\backward;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\lib\gcc\arm-fullhanv3-linux-uclibcgnueabi\6.5.0\include;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\lib\gcc\arm-fullhanv3-linux-uclibcgnueabi\6.5.0\include-fixed;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\include;\\wsl$\Ubuntu\opt\fullhan\toolchain\arm-fullhanv3-linux-uclibcgnueabi-b6\arm-fullhanv3-linux-uclibcgnueabi\sysroot\usr\include;json\include;httpserver.h\include;include;include\curl;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>$(ProjectDir)\gcc_Release.h;$(VISUALGDB_DIR)\gcc_compat.h;$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /build "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /clean "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /rebuild "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeReBuildCommandLine>
+    <NMakeOutput>$(ProjectDir)pixiu-Release.vgdbsettings</NMakeOutput>
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <NMakePreprocessorDefinitions>__VisualGDB_CFG_Release;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="httpserver.h\include\mimetype.h" />
+    <ClInclude Include="httpserver.h\mimetype.c" />
+    <ClInclude Include="include\curl\curlver.h" />
+    <ClInclude Include="include\curl\header.h" />
+    <ClInclude Include="include\curl\multi.h" />
+    <ClInclude Include="include\curl\options.h" />
+    <ClInclude Include="include\curl\system.h" />
+    <ClInclude Include="include\curl\typecheck-gcc.h" />
+    <ClInclude Include="include\curl\urlapi.h" />
+    <ClInclude Include="include\curl\websockets.h" />
+    <ClInclude Include="include\curl_utils.h" />
+    <ClInclude Include="include\curl\easy.h" />
+    <ClInclude Include="include\uuid4.h" />
+    <ClInclude Include="src\crc.c" />
+    <ClInclude Include="httpserver.h\include\httpserver.h" />
+    <ClInclude Include="httpserver.h\include\pixiuserver.h" />
+    <ClInclude Include="include\curl\curl.h" />
+    <ClInclude Include="include\curl\mprintf.h" />
+    <ClInclude Include="include\curl\stdcheaders.h" />
+    <ClInclude Include="json\include\parson.h" />
+    <ClInclude Include="json\include\parson_ex.h" />
+    <ClInclude Include="include\rs485.h" />
+    <ClInclude Include="include\app.h" />
+    <ClInclude Include="include\crc.h" />
+    <ClInclude Include="include\bits_iot_rs485_.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <ClCompile Include="src\bits_iot_rs485.c" />
+    <ClCompile Include="httpserver.h\pixiuserver.c" />
+    <ClCompile Include="json\parson.c" />
+    <ClCompile Include="json\parson_ex.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="src\curl_utils.c" />
+    <ClCompile Include="src\rs485.c" />
+    <ClCompile Include="src\app.c" />
+    <ClCompile Include="src\uuid4.c" />
+    <None Include="httpserver.h\include\LICENSE" />
+    <None Include="httpserver.h\include\README.md" />
+    <None Include="Makefile" />
+    <None Include="debug.mak" />
+    <None Include="README.md" />
+    <None Include="release.mak" />
+    <None Include="PiXiu-Debug.vgdbsettings" />
+    <None Include="PiXiu-Release.vgdbsettings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libcurl.a" />
+  </ItemGroup>
+</Project>

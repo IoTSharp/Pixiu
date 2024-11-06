@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{3dce02d2-d66a-4042-b633-e883eade730a}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{332e2f8f-e9d1-4a2f-9081-85329a05daea}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{ca51303d-8121-4407-a9e2-032bfca94bf8}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Make files">
+      <UniqueIdentifier>{da1fc20f-6c9d-4bae-8889-931da164c02b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VisualGDB settings">
+      <UniqueIdentifier>{97631b86-8d4e-45c7-8942-50f170e931e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="debug.mak">
+      <Filter>Make files</Filter>
+    </None>
+    <None Include="release.mak">
+      <Filter>Make files</Filter>
+    </None>
+    <ClCompile Include="src\bits_iot_rs485.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rs485.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <None Include="httpserver.h\include\LICENSE" />
+    <None Include="httpserver.h\include\README.md" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\crc.c">
+      <Filter>Source files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rs485.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\app.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\crc.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bits_iot_rs485_.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpserver.h\include\httpserver.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpserver.h\include\pixiuserver.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="json\include\parson.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="json\include\parson_ex.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\curl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\mprintf.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\stdcheaders.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl_utils.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\easy.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\curlver.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\header.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\multi.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\options.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\system.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\typecheck-gcc.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\urlapi.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\websockets.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\uuid4.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpserver.h\mimetype.c">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpserver.h\include\mimetype.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+    <None Include="PiXiu-Debug.vgdbsettings" />
+    <None Include="PiXiu-Release.vgdbsettings" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="httpserver.h\pixiuserver.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="json\parson.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="json\parson_ex.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\curl_utils.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\uuid4.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libcurl.a" />
+  </ItemGroup>
+</Project>
