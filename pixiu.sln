@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34902.65
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pixiu", "app\pixiu.vcxproj", "{B0CD5029-11F2-4B27-8C15-3518B42068F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{AC77F018-1AA3-4685-881E-D7039BA302D1}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		deploy\setup.sh = deploy\setup.sh
+	EndProjectSection
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "web", "web\web.esproj", "{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Debug|Any CPU.Build.0 = Debug|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Debug|x86.ActiveCfg = Debug|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Debug|x86.Build.0 = Debug|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Release|Any CPU.ActiveCfg = Release|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Release|Any CPU.Build.0 = Release|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Release|x86.ActiveCfg = Release|Win32
+		{B0CD5029-11F2-4B27-8C15-3518B42068F2}.Release|x86.Build.0 = Release|Win32
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|x86.Build.0 = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|x86.ActiveCfg = Release|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|x86.Build.0 = Release|Any CPU
+		{E37B0147-6011-4B09-9A5F-EA231DBBD3B5}.Release|x86.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F336998-59BC-470D-A5FF-1255938F0367}
+	EndGlobalSection
+EndGlobal
