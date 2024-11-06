@@ -5,6 +5,6 @@ Pixiu , 貔貅， 是一个集边缘计算与控制的物联网网关。
 
 前端控制面板
 
-![](E:\PiXiu\web\public\iotconfig.jpg)
+![物联网配置](web/public/iotconfig.jpg)
 
-![](E:\PiXiu\web\public\network.jpg)
+![网络](web/public/network.jpg)
