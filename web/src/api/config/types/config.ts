@@ -8,6 +8,7 @@ export interface IPConfigRequestData {
   gateway?: string
   netmask?: string
   broadcast?: string
+  dns?: string
 }
 
 export interface EnvConfigRequestData {

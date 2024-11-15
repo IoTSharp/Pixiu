@@ -16,6 +16,7 @@
 #define RESPONSE "Hello, World!"
 #define RESPONSE_ERR_404 "Oops. 404, you can contact 100860505 with QQ."
 #define  FILE_NETWORK_FORMAT "#!/bin/sh\n/sbin/ifconfig lo 127.0.0.1\nifconfig eth0 up\nifconfig eth0 %s netmask %s broadcast %s\nroute add default gw %s\n"
+#define  FILE_DNS_FORMAT "nameserver %s\n"
 #define  FILE_S04APP_FORMAT  "#!/bin/sh\n\necho %d > /sys/class/gpio/export\necho in > /sys/class/gpio/GPIO%d/direction\necho %d > /sys/class/gpio/export\necho in > /sys/class/gpio/GPIO%d/direction\ncd /app/\n./Run.sh &\n\n"
 #define  FILE_RUN_SH  "#!/bin/bash\nwhile true\ndo\n chmod 777 ./pixiu\n ./pixiu\n sleep 1\ndone\n"
 
@@ -111,6 +112,14 @@ void handle_request(struct http_request_s* request) {
 				json_object_dotset_string(root_object, "ip.netmask", _netmask);
 				json_object_dotset_string(root_object, "ip.broadcast", _broadcast);
 			}
+			FILE *fpdns  = fopen("/etc/resolv.conf", "r");
+			if (fpdns != NULL)
+			{
+				char _dns[20] = { 0 };
+				int fdns = fscanf(fpdns, FILE_DNS_FORMAT, _dns);
+				fclose(fpdns);
+				json_object_dotset_string(root_object, "ip.dns", _dns);
+			}
 			FILE *fp2 =  fopen("/etc/init.d/S04App", "r");
 			if (fp2 != NULL)
 			{
@@ -178,18 +187,29 @@ void handle_request(struct http_request_s* request) {
 					const char* gw = json_object_get_string(_json_request, "gateway");
 					const char* netmask = json_object_get_string(_json_request, "netmask");
 					const char* broadcast = json_object_get_string(_json_request, "broadcast");
+					const char* dns = json_object_get_string(_json_request, "dns");
 					FILE *fp  = fopen("/etc/init.d/S03network", "w");
 					if (fp != NULL)
 					{
 						fprintf(fp, FILE_NETWORK_FORMAT, ip, netmask, broadcast, gw);
 						fclose(fp);
 						chmod("/etc/init.d/S03network", S_IRWXU | S_IRWXG | S_IRWXO);
-						Http_Resp_Json(request, response, "保存完成", NULL);
-					
+						FILE *fpdns  = fopen("/etc/resolv.conf", "w");
+						if (fpdns != NULL)
+						{
+							fprintf(fpdns, FILE_DNS_FORMAT, dns);
+							fclose(fpdns);
+							Http_Resp_Json(request, response, "保存完成", NULL);
+						}
+						else 
+						{
+							Http_Resp_Text(request, response, 500, -2, "DNS配置失败");
+						
+						}
 					}
 					else 
 					{
-						Http_Resp_Text(request, response, 500, -1, "网络配置失败");
+						Http_Resp_Text(request, response, 500, -3, "网络配置失败");
 						
 					}
 				}

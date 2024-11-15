@@ -15,6 +15,7 @@ interface RuleForm {
   gateway?: string
   netmask?: string
   broadcast?: string
+  dns?: string
 }
 const loading = ref<boolean>(false)
 const formSize = ref<ComponentSize>("default")
@@ -23,7 +24,8 @@ const ruleForm = ref<RuleForm>({
   ipaddress: "",
   gateway: "",
   netmask: "",
-  broadcast: ""
+  broadcast: "",
+  dns: ""
 })
 
 const validateIP = (rule: any, value: any, callback: any) => {
@@ -114,7 +116,15 @@ const rules = reactive<FormRules<RuleForm>>({
       validator: validateBroadcast,
       trigger: "blur"
     }
-  ]
+    ],
+    dns: [
+        // 表单校验
+        {
+            required: true,
+            validator: validateBroadcast,
+            trigger: "blur"
+        }
+    ]
 })
 
 const getData = () => {
@@ -174,31 +184,32 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form
-    ref="ruleFormRef"
-    style="max-width: 600px"
-    :model="ruleForm"
-    :rules="rules"
-    label-width="auto"
-    class="demo-ruleForm"
-    :size="formSize"
-    status-icon
-  >
-    <el-form-item label="IP地址" prop="ipaddress">
-      <el-input v-model="ruleForm.ipaddress" />
-    </el-form-item>
-    <el-form-item label="网关" prop="gateway">
-      <el-input v-model="ruleForm.gateway" />
-    </el-form-item>
-    <el-form-item label="子网掩码" prop="netmask">
-      <el-input v-model="ruleForm.netmask" />
-    </el-form-item>
-    <el-form-item label="广播地址" prop="broadcast">
-      <el-input v-model="ruleForm.broadcast" />
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="loading">提交</el-button>
-      <el-button @click="resetForm(ruleFormRef)">重置</el-button>
-    </el-form-item>
-  </el-form>
+    <el-form ref="ruleFormRef"
+             style="max-width: 600px"
+             :model="ruleForm"
+             :rules="rules"
+             label-width="auto"
+             class="demo-ruleForm"
+             :size="formSize"
+             status-icon>
+        <el-form-item label="IP地址" prop="ipaddress">
+            <el-input v-model="ruleForm.ipaddress" />
+        </el-form-item>
+        <el-form-item label="网关" prop="gateway">
+            <el-input v-model="ruleForm.gateway" />
+        </el-form-item>
+        <el-form-item label="子网掩码" prop="netmask">
+            <el-input v-model="ruleForm.netmask" />
+        </el-form-item>
+        <el-form-item label="广播地址" prop="broadcast">
+            <el-input v-model="ruleForm.broadcast" />
+        </el-form-item>
+        <el-form-item label="DNS服务器" prop="dns">
+            <el-input v-model="ruleForm.dns" />
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="loading">提交</el-button>
+            <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+        </el-form-item>
+    </el-form>
 </template>

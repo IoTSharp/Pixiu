@@ -283,11 +283,11 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 }
 
 int __door_status = -1;
-
 void CheckDoorStatus(void)
 {
 	 char buf[2] = { 0 };
 	char _gpio_path[100] = { 0 };
+	int _gpio_door_id = 1;
 	sprintf(_gpio_path, "/sys/class/gpio/GPIO%d/value" , _gpio_door_id);
 	if ((access(_gpio_path, 0) == 0))
 	{
