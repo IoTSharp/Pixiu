@@ -587,9 +587,7 @@ int  App_Init(void)
 			}
 			else
 			{
-				char instanceId[UUID4_LEN] = { 0 };
-				uuid4_generate(instanceId);
-				SafeCopy(_instanceId, sizeof(_instanceId), instanceId);
+				uuid4_generate(_instanceId);
 				json_object_set_string(_object, "instanceId", _instanceId);
 				if (json_serialize_to_file_pretty(_value, CFG_JSON) != JSONSuccess)
 				{
@@ -645,7 +643,7 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	serialized_string = json_serialize_to_string_pretty(root_value);
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
-	char _url_telemetry[512] = { 0 };
+	char url_telemetry[512] = { 0 };
 	if (IsSafePathToken(_accessToken) == false)
 	{
 		echo_app("遥测上报accessToken包含不安全字符");
@@ -655,7 +653,7 @@ void UploadEvnData(BITS_IOT* _biotdata)
 		json_value_free(root_value);
 		return;
 	}
-	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
+	if (snprintf(url_telemetry, sizeof(url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(url_telemetry))
 	{
 		echo_app("遥测上报路径过长");
 		_telemetry_failure_count++;
@@ -664,7 +662,7 @@ void UploadEvnData(BITS_IOT* _biotdata)
 		json_value_free(root_value);
 		return;
 	}
-	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
+	int  ret_1 = RequestURL_Raw(_iot_server, url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
 		JSON_Value* root_value_2;
@@ -803,7 +801,7 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 	serialized_string = json_serialize_to_string_pretty(root_value);
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
-	char _url_telemetry[512] = { 0 };
+	char url_telemetry[512] = { 0 };
 	if (IsSafePathToken(_accessToken) == false)
 	{
 		echo_app("GPIO上报accessToken包含不安全字符");
@@ -812,7 +810,7 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 		json_value_free(root_value);
 		return;
 	}
-	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
+	if (snprintf(url_telemetry, sizeof(url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(url_telemetry))
 	{
 		echo_app("GPIO上报路径过长");
 		json_free_serialized_string(serialized_string);
@@ -820,7 +818,7 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 		json_value_free(root_value);
 		return;
 	}
-	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
+	int  ret_1 = RequestURL_Raw(_iot_server, url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
 		JSON_Value* root_value_2;
