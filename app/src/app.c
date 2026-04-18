@@ -8,6 +8,8 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
+#include <limits.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
 #include <ifaddrs.h>
@@ -38,9 +40,12 @@ char _rs485[256] = { 0 };
 #define PIXIU_EDGE_CONTRACT_VERSION "edge-v1"
 #define EDGE_DEFAULT_HEARTBEAT_INTERVAL_SECONDS 30
 #define EDGE_MIN_HEARTBEAT_INTERVAL_SECONDS 5
+#define EDGE_MAX_HEARTBEAT_INTERVAL_SECONDS 300
 #define EDGE_MIN_RETRY_SECONDS 5
 #define EDGE_MAX_RETRY_SECONDS 300
 #define EDGE_CAPABILITIES_REFRESH_SECONDS 60
+#define SENSOR_FAILURE_THRESHOLD 3
+#define PLATFORM_COMPONENT_MAX_LEN 60
 
 time_t _process_start_time = 0;
 int _edge_enabled = false;
@@ -94,6 +99,25 @@ static int ClampInt(int value, int min_value, int max_value)
 		return max_value;
 	}
 	return value;
+}
+
+static int IsSafePathToken(const char* token)
+{
+	size_t i;
+	if (StringIsEmpty(token))
+	{
+		return false;
+	}
+	for (i = 0; token[i] != '\0'; ++i)
+	{
+		unsigned char ch = (unsigned char)token[i];
+		if (isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')
+		{
+			continue;
+		}
+		return false;
+	}
+	return true;
 }
 
 static void ScheduleRegisterRetry(void)
@@ -169,7 +193,7 @@ static void RefreshRuntimeIdentity(void)
 	if (uname(&uts) == 0)
 	{
 		char platform[sizeof(_runtime_platform)] = { 0 };
-		snprintf(platform, sizeof(platform), "%.60s/%.60s", uts.sysname, uts.machine);
+		snprintf(platform, sizeof(platform), "%.*s/%.*s", PLATFORM_COMPONENT_MAX_LEN, uts.sysname, PLATFORM_COMPONENT_MAX_LEN, uts.machine);
 		SafeCopy(_runtime_platform, sizeof(_runtime_platform), platform);
 	}
 	else if (StringIsEmpty(_runtime_platform))
@@ -269,16 +293,21 @@ static JSON_Value* BuildCapabilitiesPayload(void)
 static JSON_Value* BuildHeartbeatPayload(void)
 {
 	struct timeval tv;
+	time_t uptime = time(NULL) - _process_start_time;
 	JSON_Value* root_value = json_value_init_object();
 	JSON_Object* root_object = json_value_get_object(root_value);
 	JSON_Value* metrics_value = json_value_init_object();
 	JSON_Object* metrics_object = json_value_get_object(metrics_value);
 	RefreshRuntimeIdentity();
 	gettimeofday(&tv, NULL);
+	if (uptime < 0)
+	{
+		uptime = 0;
+	}
 	json_object_set_string_iso8601(root_object, "timestamp", &tv);
-	json_object_set_string(root_object, "status", _edge_registered ? "Running" : "Registered");
-	json_object_set_boolean(root_object, "healthy", _sensor_read_failure_streak < 3 ? true : false);
-	json_object_set_number(root_object, "uptimeSeconds", (int)(time(NULL) - _process_start_time));
+	json_object_set_string(root_object, "status", "Running");
+	json_object_set_boolean(root_object, "healthy", _sensor_read_failure_streak < SENSOR_FAILURE_THRESHOLD ? true : false);
+	json_object_set_number(root_object, "uptimeSeconds", (int)(uptime > INT_MAX ? INT_MAX : uptime));
 	json_object_set_string(root_object, "ipAddress", _runtime_ip_address);
 	json_object_set_number(metrics_object, "telemetrySuccessCount", _telemetry_success_count);
 	json_object_set_number(metrics_object, "telemetryFailureCount", _telemetry_failure_count);
@@ -375,7 +404,7 @@ static int RegisterEdgeRuntime(void)
 		if (json_object_dothas_value_of_type(root_object, "data.timeout", JSONNumber))
 		{
 			int timeout = json_object_dotget_number(root_object, "data.timeout");
-			_edge_heartbeat_interval_seconds = ClampInt(timeout > 0 ? timeout / 2 : EDGE_DEFAULT_HEARTBEAT_INTERVAL_SECONDS, EDGE_MIN_HEARTBEAT_INTERVAL_SECONDS, EDGE_MAX_RETRY_SECONDS);
+			_edge_heartbeat_interval_seconds = ClampInt(timeout > 0 ? timeout / 2 : EDGE_DEFAULT_HEARTBEAT_INTERVAL_SECONDS, EDGE_MIN_HEARTBEAT_INTERVAL_SECONDS, EDGE_MAX_HEARTBEAT_INTERVAL_SECONDS);
 		}
 		else
 		{
@@ -581,7 +610,7 @@ int  App_Init(void)
 		result = -2;
 	}
 	RefreshRuntimeIdentity();
-	_edge_enabled = !StringIsEmpty(_iot_server) && !StringIsEmpty(_accessToken) && !StringIsEmpty(_instanceId);
+	_edge_enabled = !StringIsEmpty(_iot_server) && !StringIsEmpty(_accessToken) && !StringIsEmpty(_instanceId) && IsSafePathToken(_accessToken);
 	if (_edge_enabled == false && result == 0)
 	{
 		echo_app("未启用Edge控制面上报，请检查server/accessToken/instanceId配置");
@@ -617,6 +646,15 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
 	char _url_telemetry[512] = { 0 };
+	if (IsSafePathToken(_accessToken) == false)
+	{
+		echo_app("遥测上报accessToken包含不安全字符");
+		_telemetry_failure_count++;
+		json_free_serialized_string(serialized_string);
+		FreeMemoryStruct(&response);
+		json_value_free(root_value);
+		return;
+	}
 	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
 	{
 		echo_app("遥测上报路径过长");
@@ -766,6 +804,14 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
 	char _url_telemetry[512] = { 0 };
+	if (IsSafePathToken(_accessToken) == false)
+	{
+		echo_app("GPIO上报accessToken包含不安全字符");
+		json_free_serialized_string(serialized_string);
+		FreeMemoryStruct(&response);
+		json_value_free(root_value);
+		return;
+	}
 	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
 	{
 		echo_app("GPIO上报路径过长");
