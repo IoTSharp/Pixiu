@@ -61,7 +61,7 @@ char _runtime_host_name[128] = { 0 };
 char _runtime_platform[128] = { 0 };
 char _runtime_ip_address[64] = { 0 };
 char _edge_contract_version[64] = { 0 };
-int __door_status = -1;
+int _door_status = -1;
 
 static void SafeCopy(char* dst, size_t dstlen, const char* src)
 {
@@ -283,7 +283,7 @@ static JSON_Value* BuildHeartbeatPayload(void)
 	json_object_set_number(metrics_object, "telemetrySuccessCount", _telemetry_success_count);
 	json_object_set_number(metrics_object, "telemetryFailureCount", _telemetry_failure_count);
 	json_object_set_number(metrics_object, "lastSensorReadCode", _last_sensor_read_code);
-	json_object_set_number(metrics_object, "doorStatus", __door_status);
+	json_object_set_number(metrics_object, "doorStatus", _door_status);
 	json_object_set_number(metrics_object, "heartbeatIntervalSeconds", _edge_heartbeat_interval_seconds);
 	json_object_set_value(root_object, "metrics", metrics_value);
 	return root_value;
@@ -360,7 +360,13 @@ static int RegisterEdgeRuntime(void)
 	char path[512] = { 0 };
 	JSON_Value* response_root = NULL;
 	int success = 0;
-	snprintf(path, sizeof(path), "api/Edge/%s/Register", _accessToken);
+	if (snprintf(path, sizeof(path), "api/Edge/%s/Register", _accessToken) >= sizeof(path))
+	{
+		echo_app("边缘运行时注册路径过长");
+		json_value_free(payload);
+		ScheduleRegisterRetry();
+		return 0;
+	}
 	success = ExecuteEdgeRequest(path, "边缘运行时注册", payload, &response_root);
 	json_value_free(payload);
 	if (success == 1)
@@ -408,7 +414,15 @@ static int ReportEdgeCapabilities(void)
 	char path[512] = { 0 };
 	char* snapshot = NULL;
 	int success = 0;
-	snprintf(path, sizeof(path), "api/Edge/%s/Capabilities", _accessToken);
+	if (snprintf(path, sizeof(path), "api/Edge/%s/Capabilities", _accessToken) >= sizeof(path))
+	{
+		echo_app("边缘能力上报路径过长");
+		_edge_registered = false;
+		_edge_capabilities_dirty = true;
+		ScheduleRegisterRetry();
+		json_value_free(payload);
+		return 0;
+	}
 	snapshot = json_serialize_to_string(payload);
 	success = ExecuteEdgeRequest(path, "边缘能力上报", payload, NULL);
 	if (success == 1)
@@ -439,7 +453,13 @@ static int SendEdgeHeartbeat(void)
 	JSON_Value* payload = BuildHeartbeatPayload();
 	char path[512] = { 0 };
 	int success = 0;
-	snprintf(path, sizeof(path), "api/Edge/%s/Heartbeat", _accessToken);
+	if (snprintf(path, sizeof(path), "api/Edge/%s/Heartbeat", _accessToken) >= sizeof(path))
+	{
+		echo_app("边缘心跳上报路径过长");
+		json_value_free(payload);
+		ScheduleRegisterRetry();
+		return 0;
+	}
 	success = ExecuteEdgeRequest(path, "边缘心跳上报", payload, NULL);
 	json_value_free(payload);
 	if (success == 1)
@@ -597,7 +617,15 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
 	char _url_telemetry[512] = { 0 };
-	snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken);
+	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
+	{
+		echo_app("遥测上报路径过长");
+		_telemetry_failure_count++;
+		json_free_serialized_string(serialized_string);
+		FreeMemoryStruct(&response);
+		json_value_free(root_value);
+		return;
+	}
 	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
@@ -738,7 +766,14 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
 	char _url_telemetry[512] = { 0 };
-	snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken);
+	if (snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken) >= sizeof(_url_telemetry))
+	{
+		echo_app("GPIO上报路径过长");
+		json_free_serialized_string(serialized_string);
+		FreeMemoryStruct(&response);
+		json_value_free(root_value);
+		return;
+	}
 	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
@@ -863,11 +898,11 @@ void CheckDoorStatus(void)
 			if (readlen > 0)
 			{
 				int _value = buf[0] - (char)'0';
-				if (__door_status != _value)
+				if (_door_status != _value)
 				{
-					__door_status = _value;
-					echo_app("门状态切换为:%d", __door_status);
-					UploadGpioValue("door",__door_status);
+					_door_status = _value;
+					echo_app("门状态切换为:%d", _door_status);
+					UploadGpioValue("door",_door_status);
 				}
 			}
 			else 
