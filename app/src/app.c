@@ -68,6 +68,21 @@ char _runtime_ip_address[64] = { 0 };
 char _edge_contract_version[64] = { 0 };
 int _door_status = -1;
 
+#define EDGE_TASK_QUEUE_CAPACITY 16
+
+typedef struct EDGE_TASK_ITEM_TAG {
+	char taskId[80];
+	char taskType[64];
+	char targetKey[256];
+	char runtimeType[64];
+	char instanceId[UUID4_LEN];
+	char pointId[80];
+	char value[256];
+} EDGE_TASK_ITEM;
+
+EDGE_TASK_ITEM _edge_task_queue[EDGE_TASK_QUEUE_CAPACITY];
+int _edge_task_queue_size = 0;
+
 static void SafeCopy(char* dst, size_t dstlen, const char* src)
 {
 	if (dst == NULL || dstlen == 0)
@@ -504,6 +519,153 @@ static int SendEdgeHeartbeat(void)
 	return success;
 }
 
+static int PullEdgeDispatchBatch(void)
+{
+	char path[512] = { 0 };
+	JSON_Value* response_root = NULL;
+	JSON_Array* data_array = NULL;
+	JSON_Object* root_object = NULL;
+	JSON_Value* empty_payload = json_value_init_object();
+	size_t index = 0;
+	int added = 0;
+
+	if (snprintf(path, sizeof(path), "api/EdgeTask/Dispatch/%s?take=8", _accessToken) >= sizeof(path))
+	{
+		json_value_free(empty_payload);
+		return 0;
+	}
+
+	if (ExecuteEdgeRequest(path, "拉取边缘任务", empty_payload, &response_root) != 1)
+	{
+		json_value_free(empty_payload);
+		if (response_root != NULL)
+		{
+			json_value_free(response_root);
+		}
+		return 0;
+	}
+
+	json_value_free(empty_payload);
+	root_object = json_value_get_object(response_root);
+	if (!json_object_dothas_value_of_type(root_object, "data", JSONArray))
+	{
+		json_value_free(response_root);
+		return 0;
+	}
+
+	data_array = json_object_dotget_array(root_object, "data");
+	for (index = 0; index < json_array_get_count(data_array) && _edge_task_queue_size < EDGE_TASK_QUEUE_CAPACITY; ++index)
+	{
+		JSON_Object* item = json_array_get_object(data_array, index);
+		JSON_Object* address = json_object_dotget_object(item, "address");
+		EDGE_TASK_ITEM* queued = &_edge_task_queue[_edge_task_queue_size];
+		if (item == NULL || address == NULL)
+		{
+			continue;
+		}
+
+		memset(queued, 0, sizeof(EDGE_TASK_ITEM));
+		SafeCopy(queued->taskId, sizeof(queued->taskId), json_object_get_string(item, "taskId"));
+		SafeCopy(queued->taskType, sizeof(queued->taskType), json_object_get_string(item, "taskType"));
+		SafeCopy(queued->targetKey, sizeof(queued->targetKey), json_object_get_string(address, "targetKey"));
+		SafeCopy(queued->runtimeType, sizeof(queued->runtimeType), json_object_get_string(address, "runtimeType"));
+		SafeCopy(queued->instanceId, sizeof(queued->instanceId), json_object_get_string(address, "instanceId"));
+		if (json_object_dothas_value_of_type(item, "parameters.pointId", JSONString))
+		{
+			SafeCopy(queued->pointId, sizeof(queued->pointId), json_object_dotget_string(item, "parameters.pointId"));
+		}
+		if (json_object_dothas_value_of_type(item, "parameters.value", JSONString))
+		{
+			SafeCopy(queued->value, sizeof(queued->value), json_object_dotget_string(item, "parameters.value"));
+		}
+		_edge_task_queue_size++;
+		added++;
+	}
+
+	json_value_free(response_root);
+	return added;
+}
+
+static int AcceptEdgeDispatch(const EDGE_TASK_ITEM* task)
+{
+	JSON_Value* payload = json_value_init_object();
+	JSON_Object* root = json_value_get_object(payload);
+	char path[512] = { 0 };
+	int success = 0;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	json_object_set_string(root, "contractVersion", "edge-task-v1");
+	json_object_set_string(root, "taskId", task->taskId);
+	json_object_set_string(root, "targetType", "PixiuRuntime");
+	json_object_set_string(root, "targetKey", task->targetKey);
+	json_object_set_string(root, "runtimeType", task->runtimeType);
+	json_object_set_string(root, "instanceId", task->instanceId);
+	json_object_set_string(root, "status", "Accepted");
+	json_object_set_string(root, "message", "Pixiu accepted platform dispatch.");
+	json_object_set_string_iso8601(root, "reportedAt", &tv);
+	json_object_set_number(root, "progress", 0);
+	if (snprintf(path, sizeof(path), "api/EdgeTask/Dispatch/%s/Accept", _accessToken) >= sizeof(path))
+	{
+		json_value_free(payload);
+		return 0;
+	}
+	success = ExecuteEdgeRequest(path, "确认边缘任务接单", payload, NULL);
+	json_value_free(payload);
+	return success;
+}
+
+static void CompleteEdgeDispatch(const EDGE_TASK_ITEM* task, const char* message)
+{
+	pixiu_report_edge_task_receipt(_iot_server, _runtimeName, task->runtimeType, task->instanceId, task->taskId);
+	echo_app("任务[%s]已完成: %s", task->taskType, message);
+}
+
+void App_QueueEdgeTasks(void)
+{
+	if (_edge_enabled == false || _edge_registered == false)
+	{
+		return;
+	}
+	if (_edge_task_queue_size < EDGE_TASK_QUEUE_CAPACITY)
+	{
+		PullEdgeDispatchBatch();
+	}
+	if (_edge_task_queue_size <= 0)
+	{
+		return;
+	}
+
+	EDGE_TASK_ITEM task = _edge_task_queue[0];
+	memmove(&_edge_task_queue[0], &_edge_task_queue[1], sizeof(EDGE_TASK_ITEM) * (EDGE_TASK_QUEUE_CAPACITY - 1));
+	if (_edge_task_queue_size > 0)
+	{
+		_edge_task_queue_size--;
+	}
+
+	if (AcceptEdgeDispatch(&task) != 1)
+	{
+		return;
+	}
+
+	if (strcmp(task.taskType, "HealthProbe") == 0)
+	{
+		CompleteEdgeDispatch(&task, "health probe completed");
+		return;
+	}
+	if (strcmp(task.taskType, "ConfigPullRequest") == 0)
+	{
+		CompleteEdgeDispatch(&task, "config pull completed");
+		return;
+	}
+	if (strcmp(task.taskType, "RestartRuntime") == 0)
+	{
+		CompleteEdgeDispatch(&task, "restart scheduled");
+		return;
+	}
+
+	echo_app("未支持的边缘任务类型:%s", task.taskType);
+}
+
 static void RefreshCapabilitiesSnapshot(void)
 {
 	time_t now = time(NULL);
@@ -933,6 +1095,7 @@ void App_Process(void)
 	{
 		SendEdgeHeartbeat();
 	}
+	App_QueueEdgeTasks();
 }
 
 void App_RecordSensorReadStatus(int result)

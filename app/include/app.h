@@ -18,5 +18,6 @@ void App_StartControlPlane(void);
 void App_Process(void);
 void App_RecordSensorReadStatus(int result);
 void App_ReportTaskReceipt(const char* taskType, const char* message);
+void App_QueueEdgeTasks(void);
 
 char * GetRS485(void);
