@@ -111,7 +111,7 @@ static int IsSafePathToken(const char* token)
 	for (i = 0; token[i] != '\0'; ++i)
 	{
 		unsigned char ch = (unsigned char)token[i];
-		if (isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')
+		if (isalnum(ch) || ch == '-' || ch == '_')
 		{
 			continue;
 		}
@@ -591,7 +591,7 @@ int  App_Init(void)
 				json_object_set_string(_object, "instanceId", _instanceId);
 				if (json_serialize_to_file_pretty(_value, CFG_JSON) != JSONSuccess)
 				{
-					echo_app("instanceId写入配置文件失败");
+					echo_app("instanceId写入配置文件失败:%s", CFG_JSON);
 				}
 			}
 			json_value_free(_value);
@@ -667,7 +667,12 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	{
 		JSON_Value* root_value_2;
 		root_value_2 = json_parse_string(response.memory);
-		if (root_value_2 != NULL && json_value_get_type(root_value_2) == JSONObject)
+		if (root_value_2 == NULL)
+		{
+			echo_app("返回内容无法解析为Json:%d 响应代码:%ld", ret_1, responseCode);
+			_telemetry_failure_count++;
+		}
+		else if (json_value_get_type(root_value_2) == JSONObject)
 		{
 			JSON_Object* jsonobj = json_value_get_object(root_value_2);
 			if (json_object_has_value_of_type(jsonobj, "code", JSONNumber) && json_object_has_value_of_type(jsonobj, "msg", JSONString))
@@ -823,7 +828,11 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 	{
 		JSON_Value* root_value_2;
 		root_value_2 = json_parse_string(response.memory);
-		if (root_value_2 != NULL && json_value_get_type(root_value_2) == JSONObject)
+		if (root_value_2 == NULL)
+		{
+			echo_app("返回内容无法解析为Json:%d 响应代码:%ld", ret_1, responseCode);
+		}
+		else if (json_value_get_type(root_value_2) == JSONObject)
 		{
 			JSON_Object* jsonobj = json_value_get_object(root_value_2);
 			if (json_object_has_value_of_type(jsonobj, "code", JSONNumber) && json_object_has_value_of_type(jsonobj, "msg", JSONString))
