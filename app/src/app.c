@@ -684,6 +684,7 @@ void UploadEvnData(BITS_IOT* _biotdata)
 				if (_code == 200)
 				{
 					_telemetry_success_count++;
+					App_ReportTaskReceipt("telemetry-upload", "PiXiu telemetry upload completed.");
 				}
 				else
 				{
@@ -714,6 +715,22 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	json_free_serialized_string(serialized_string);
 	FreeMemoryStruct(&response);
 	json_value_free(root_value);
+}
+
+void App_ReportTaskReceipt(const char* taskType, const char* message)
+{
+	char synthetic_task_id[128] = { 0 };
+	time_t now = time(NULL);
+	if (taskType == NULL || message == NULL)
+	{
+		return;
+	}
+	if (_edge_enabled == false)
+	{
+		return;
+	}
+	snprintf(synthetic_task_id, sizeof(synthetic_task_id), "%s-%ld", taskType, (long)now);
+	pixiu_report_edge_task_receipt(_iot_server, _runtimeName, PIXIU_RUNTIME_TYPE, _instanceId, synthetic_task_id);
 }
 
 void SyncDateTime(void)
