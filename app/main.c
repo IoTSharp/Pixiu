@@ -19,12 +19,17 @@ int main(int argc, char **argv)
 	int result =App_Init();
 	int __update_time = 0;
 	int __upload_evnet_data = 0;
+	if (result == 0)
+	{
+		App_StartControlPlane();
+	}
 
 	do
 	{
 	
 		if (result == 0)
 		{
+			App_Process();
 			
 		
 			time_t current_time;
@@ -46,6 +51,7 @@ int main(int argc, char **argv)
 				// 转换为本地时间字符串形式
 				c_time_string = ctime(&current_time);
 				int result = read_bits_iot_rs485_data(GetRS485(), 9600, &_biotdata);
+				App_RecordSensorReadStatus(result);
 				if (result == 0)
 				{
 					echo_app("%s 温度:%5.2f℃  湿度:%5.2f%%  烟雾浓度:%dppm PM1.0:%dug/m3 PM2.5%dug/m3 PM10:%dug/m3\n", c_time_string, _biotdata._temperature, _biotdata._humidity, _biotdata._smog, _biotdata._PM1_0, _biotdata._PM2_5, _biotdata._PM10);	
@@ -68,4 +74,3 @@ int main(int argc, char **argv)
 	} while (1);
 	return 0;
 }
-

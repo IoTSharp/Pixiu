@@ -14,5 +14,8 @@ void UploadEvnData(BITS_IOT* _biotdata);
 void SyncDateTime(void);
 void CheckDoorStatus(void);
 int App_Init(void);
+void App_StartControlPlane(void);
+void App_Process(void);
+void App_RecordSensorReadStatus(int result);
 
 char * GetRS485(void);
