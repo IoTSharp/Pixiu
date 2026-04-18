@@ -139,12 +139,12 @@ static int GetPrimaryIpv4Address(char* ipAddress, size_t ipAddressLen)
 		{
 			continue;
 		}
-		if ((ifa->ifa_flags & IFF_LOOPBACK) == IFF_LOOPBACK)
-		{
-			continue;
-		}
 		if (inet_ntop(AF_INET, &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr, ipAddress, ipAddressLen) != NULL)
 		{
+			if (strncmp(ipAddress, "127.", 4) == 0)
+			{
+				continue;
+			}
 			freeifaddrs(ifaddr);
 			return 0;
 		}
@@ -169,7 +169,7 @@ static void RefreshRuntimeIdentity(void)
 	if (uname(&uts) == 0)
 	{
 		char platform[sizeof(_runtime_platform)] = { 0 };
-		snprintf(platform, sizeof(platform), "%s/%s", uts.sysname, uts.machine);
+		snprintf(platform, sizeof(platform), "%.60s/%.60s", uts.sysname, uts.machine);
 		SafeCopy(_runtime_platform, sizeof(_runtime_platform), platform);
 	}
 	else if (StringIsEmpty(_runtime_platform))
@@ -596,8 +596,8 @@ void UploadEvnData(BITS_IOT* _biotdata)
 	serialized_string = json_serialize_to_string_pretty(root_value);
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
-	char _url_telemetry[255] = { 0 };
-	sprintf(_url_telemetry, "api/devices/%s/telemetry", _accessToken);
+	char _url_telemetry[512] = { 0 };
+	snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken);
 	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
@@ -737,8 +737,8 @@ void UploadGpioValue(char* gpioname,int gpiovalue)
 	serialized_string = json_serialize_to_string_pretty(root_value);
 	struct MemoryStruct  response = { NULL, 0 };
 	long responseCode = -1;
-	char _url_telemetry[255] = { 0 };
-	sprintf(_url_telemetry, "api/devices/%s/telemetry", _accessToken);
+	char _url_telemetry[512] = { 0 };
+	snprintf(_url_telemetry, sizeof(_url_telemetry), "api/devices/%s/telemetry", _accessToken);
 	int  ret_1 = RequestURL_Raw(_iot_server, _url_telemetry, POST, serialized_string, &responseCode, &response, 5);
 	if (ret_1 == 1  && response.size > 0)
 	{
