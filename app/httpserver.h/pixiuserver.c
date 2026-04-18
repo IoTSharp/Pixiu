@@ -157,6 +157,30 @@ void handle_request(struct http_request_s* request) {
 					json_object_set_string(root_object, "accessToken", accessToken);
 					echo_httpserver("accessToken=%s", accessToken);
 				}
+				if (json_object_has_value_of_type(_json_request, "runtimeName", JSONString))
+				{
+					const char* runtimeName = json_object_get_string(_json_request, "runtimeName");
+					json_object_set_string(root_object, "runtimeName", runtimeName);
+					echo_httpserver("runtimeName=%s", runtimeName);
+				}
+				if (json_object_has_value_of_type(_json_request, "instanceId", JSONString))
+				{
+					const char* instanceId = json_object_get_string(_json_request, "instanceId");
+					json_object_set_string(root_object, "instanceId", instanceId);
+					echo_httpserver("instanceId=%s", instanceId);
+				}
+				if (json_object_has_value_of_type(_json_request, "site", JSONString))
+				{
+					const char* site = json_object_get_string(_json_request, "site");
+					json_object_set_string(root_object, "site", site);
+					echo_httpserver("site=%s", site);
+				}
+				if (json_object_has_value_of_type(_json_request, "deploymentRole", JSONString))
+				{
+					const char* deploymentRole = json_object_get_string(_json_request, "deploymentRole");
+					json_object_set_string(root_object, "deploymentRole", deploymentRole);
+					echo_httpserver("deploymentRole=%s", deploymentRole);
+				}
 				JSON_Status return_code = json_serialize_to_file_pretty(root_value, CFG_JSON);
 				if (return_code == JSONSuccess)
 				{
