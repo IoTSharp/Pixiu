@@ -4,7 +4,7 @@
 >
 > 顺序：`[串行]` ｜ `[并行]` ｜ `[依赖: X]`
 
-> 在 IoTSharp.SaaS 生态中，本仓库被引用为 **`IoTSharp.Edge.Linux`** —— Linux C 边缘基座与 BasicRuntime 的 C 版宿主。
+> 在 IoTSharp.SaaS 生态中，本仓库被引用为 **`IoTEdge.Linux`** —— Linux C 边缘基座与 BasicRuntime 的 C 版宿主。
 
 ## 0. 范围
 
@@ -60,7 +60,7 @@
 | --- | --- | --- | --- |
 | D1 | ⏳ | [依赖: A5] | BasicRuntime 接口注册表 C 实现 |
 | D2 | ⏳ | [依赖: D1] | 脚本加载、签名校验、版本槽 |
-| D3 | ⏳ | [依赖: D1] | 与 `external/IoTSharp.Edge.Stm32` / `external/IoTSharp.Edge` 接口签名对齐 |
+| D3 | ⏳ | [依赖: D1] | 与 `external/IoTEdge.Stm32` / `external/IoTEdge` 接口签名对齐 |
 | D4 | ⏳ | [依赖: D2] | 沙箱与运行预算 |
 
 ## 6. Phase E — 电源与现场可运维　⏳
@@ -75,5 +75,5 @@
 ## 7. 接口稳定性公约
 
 - 与 `IoTSharp.SaaS` 端 `IoTSharp.CodeGen.LinuxC` 之间的接口为公开契约；破坏性变更需 6 个月废弃期。
-- 与 `external/IoTSharp.Edge.Stm32`、`external/IoTSharp.Edge` 共同维护 BasicRuntime 接口签名表。
+- 与 `external/IoTEdge.Stm32`、`external/IoTEdge` 共同维护 BasicRuntime 接口签名表。
 - 本仓库不感知租户 / 计费 / License。
